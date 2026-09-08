@@ -1,0 +1,61 @@
+schema_version: 1
+
+context:
+  version: "1.8.5"
+
+package:
+  name: wgrib
+  version: ${{ version }}
+
+source:
+  url: https://ftp.cpc.ncep.noaa.gov/wd51we/wgrib/wgrib.tar.v${{ version }}
+  sha256: f1746afdb7d627f546a333f7a548694003bbc042202fdffb646a5e584ad38884
+  patches:
+    - ccompiler.patch
+
+build:
+  number: 1
+  prefix_detection:
+    ignore_binary_files: false
+
+requirements:
+  build:
+    - if: not win
+      then: ${{ compiler('c') }}
+    - if: not win
+      then: ${{ stdlib("c") }}
+    - if: win
+      then: ${{ compiler('m2w64_c') }}
+    - if: win
+      then: ${{ stdlib("m2w64_c") }}
+    - if: not win
+      then: make
+    - if: win
+      then: m2-make
+    - if: win
+      then: m2-sed
+    - if: win
+      then: m2-coreutils
+    - if: win
+      then: m2-filesystem
+    - if: win
+      then: m2-zip
+  host:
+
+tests:
+  - files:
+      recipe:
+        - land.grb
+    script:
+      - wgrib land.grb -d 1
+
+about:
+  license: SAX-PD
+  license_file: NOTICE
+  summary: Manipulate, inventory and decode GRIB files
+  homepage: https://www.cpc.ncep.noaa.gov/products/wesley/wgrib.html
+
+extra:
+  recipe-maintainers:
+    - akrherz
+    - ocefpaf
